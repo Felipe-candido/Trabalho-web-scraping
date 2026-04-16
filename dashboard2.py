@@ -69,7 +69,7 @@ st.subheader("Preço por loja (Top 10)")
 fig2 = px.box(df_lojas, x="loja", y="preco")
 st.plotly_chart(fig2, use_container_width=True)
 
-# =========================
+
 # GRÁFICO 3
 st.subheader("Desconto vs Preço")
 fig3 = px.scatter(
@@ -110,9 +110,7 @@ st.dataframe(top[[
     "desconto_pct", "avaliacao"
 ]])
 
-# =========================
 # DATASET COMPLETO
-# =========================
 st.subheader("Dataset completo")
 
 df_view = df.copy()
