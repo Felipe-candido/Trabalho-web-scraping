@@ -60,6 +60,8 @@ class MercadoLivre:
                 continue
 
             soup = BeautifulSoup(html, "html.parser")
+            
+            input(soup)
 
             items = soup.find_all("li", class_="ui-search-layout__item")
 
