@@ -189,16 +189,16 @@ df_uniq = df.drop_duplicates(subset=["titulo"])
 # ─────────────────────────────────────────────
 # HEADER
 # ─────────────────────────────────────────────
-st.title("📱 Mercado Livre — Análise de Celulares")
+st.title(" Mercado Livre — Análise de Celulares")
 st.caption("Dataset coletado via scraping do Mercado Livre. Trabalho Prático — Mineração de Dados, Fase 2.")
 
 # KPIs
 c1, c2, c3, c4, c5 = st.columns(5)
-c1.metric("📋 Anúncios", f"{len(df):,}")
-c2.metric("💰 Preço médio", formatar_brl(df_uniq["preco"].mean()))
-c3.metric("📉 Desconto médio", f"{df_uniq['desconto_pct'].mean():.1f}%")
-c4.metric("🚚 Frete grátis", f"{df['frete_gratis'].mean()*100:.1f}%")
-c5.metric("⭐ Avaliação média", f"{df_uniq['avaliacao'].mean():.2f}")
+c1.metric(" Anúncios", f"{len(df):,}")
+c2.metric(" Preço médio", formatar_brl(df_uniq["preco"].mean()))
+c3.metric(" Desconto médio", f"{df_uniq['desconto_pct'].mean():.1f}%")
+c4.metric(" Frete grátis", f"{df['frete_gratis'].mean()*100:.1f}%")
+c5.metric(" Avaliação média", f"{df_uniq['avaliacao'].mean():.2f}")
 
 st.markdown("---")
 
@@ -206,11 +206,11 @@ st.markdown("---")
 # ABAS
 # ─────────────────────────────────────────────
 abas = st.tabs([
-    "📊 Visão Geral",
-    "📦 Pergunta 1 — Preços por Loja",
-    "🏷️ Pergunta 2 — Desconto × Avaliação",
-    "🤖 Pergunta 3 — Modelo ML",
-    "🏆 Melhores Oportunidades",
+    " Visão Geral",
+    " Pergunta 1 — Preços por Loja",
+    " Pergunta 2 — Desconto × Avaliação",
+    " Pergunta 3 — Modelo ML",
+    " Melhores Oportunidades",
 ])
 
 
