@@ -145,7 +145,7 @@ df_raw = carregar_dados()
 # ─────────────────────────────────────────────
 # SIDEBAR — FILTROS GLOBAIS
 # ─────────────────────────────────────────────
-st.sidebar.title("🔧 Filtros Globais")
+st.sidebar.title(" Filtros Globais")
 st.sidebar.caption("Aplicados a todas as abas do dashboard.")
 
 todas_lojas = sorted(df_raw["loja"].dropna().unique())
@@ -167,9 +167,9 @@ frete_opcao = st.sidebar.radio(
 st.sidebar.markdown("---")
 st.sidebar.caption("**Perguntas analíticas exploradas:**")
 st.sidebar.markdown("""
-1. 📦 Quais lojas têm maiores preços médios e variabilidade?
-2. 🏷️ Maior desconto implica melhor avaliação?
-3. 🤖 É possível prever se o celular terá preço acima da mediana?
+1.  Quais lojas têm maiores preços médios e variabilidade?
+2.  Maior desconto implica melhor avaliação?
+3.  É possível prever se o celular terá preço acima da mediana?
 """)
 
 # Aplicar filtros
@@ -219,13 +219,11 @@ abas = st.tabs([
 # ══════════════════════════════════════════════
 with abas[0]:
     st.subheader("Visão Geral do Dataset")
-    st.markdown("Explore a distribuição global dos dados, servindo de contexto para as perguntas analíticas.")
-
     col_a, col_b = st.columns(2)
 
     with col_a:
         st.markdown("**Distribuição de Preços**")
-        st.caption("Histograma mostra a concentração de anúncios por faixa de preço. Filtros laterais permitem recorte por loja e frete.")
+        st.caption("Histograma mostra a concentração de anúncios por faixa de preço.")
         nbins = st.slider("Número de barras", 10, 60, 30, key="hist_bins")
         fig_hist = px.histogram(
             df_uniq, x="preco", nbins=nbins,
@@ -243,19 +241,19 @@ with abas[0]:
         st.plotly_chart(fig_hist, use_container_width=True)
 
     with col_b:
-        st.markdown("**Participação das Lojas (Top 15)**")
-        st.caption("Gráfico de pizza mostra o volume de anúncios por loja. Use filtro de frete na barra lateral.")
+        st.markdown("**Participação das Lojas (Top 10)**")
+        st.caption("Gráfico de pizza mostra o volume de anúncios por loja.")
         top15 = df["loja"].value_counts().head(15)
         fig_pie = px.pie(
             values=top15.values, names=top15.index,
             color_discrete_sequence=CORES_LOJAS,
-            title="Distribuição de Anúncios por Loja (Top 15)"
+            title="Distribuição de Anúncios por Loja (Top 10)"
         )
         fig_pie.update_traces(textinfo="percent+label")
         st.plotly_chart(fig_pie, use_container_width=True)
 
     st.markdown("**Frete Grátis × Preço × Desconto (%)**")
-    st.caption("Scatter plot relaciona preço, desconto e condição de frete. Ajuda a identificar se os maiores descontos estão concentrados em produtos com frete grátis.")
+    st.caption("Scatter plot relaciona preço, desconto e condição de frete.")
     df_frete = df_uniq.dropna(subset=["desconto_pct"])
     fig_frete = px.scatter(
         df_frete,
@@ -278,11 +276,10 @@ with abas[0]:
 # ══════════════════════════════════════════════
 with abas[1]:
     st.markdown(
-        '<div class="pergunta-box">❓ <b>Pergunta 1:</b> Quais lojas concentram os maiores preços médios '
+        '<div class="pergunta-box"> <b>Pergunta 1:</b> Quais lojas concentram os maiores preços médios '
         'e maior variabilidade de preços no Mercado Livre?</div>',
         unsafe_allow_html=True
     )
-    st.caption("Respondida pelo dashboard. Filtros permitem recortar a análise por frete grátis e quantidade mínima de anúncios.")
 
     col1, col2 = st.columns([1, 3])
     with col1:
@@ -373,16 +370,13 @@ with abas[1]:
     )
 
 
-# ══════════════════════════════════════════════
 # ABA 2 — PERGUNTA 2
-# ══════════════════════════════════════════════
 with abas[2]:
     st.markdown(
-        '<div class="pergunta-box">❓ <b>Pergunta 2:</b> Produtos com maior percentual de desconto '
+        '<div class="pergunta-box"> <b>Pergunta 2:</b> Produtos com maior percentual de desconto '
         'tendem a ter preços mais elevados ou mais acessíveis?</div>',
         unsafe_allow_html=True
     )
-    st.caption("Respondida pelo dashboard. Filtros permitem segmentar por faixa de desconto e loja.")
 
     df_p2 = df_uniq.dropna(subset=["desconto_pct", "preco", "preco_antigo"])
     df_p2 = df_p2[df_p2["desconto_pct"] > 0]
@@ -440,51 +434,19 @@ with abas[2]:
     fig_box2.update_layout(plot_bgcolor="white", showlegend=False)
     st.plotly_chart(fig_box2, use_container_width=True)
 
-    # Correlação por loja
-    corr_loja = (
-        df_p2.groupby("loja")
-        .apply(lambda g: g[["desconto_pct", "preco_antigo"]].corr().iloc[0, 1] if len(g) > 5 else None)
-        .dropna()
-        .reset_index()
-    )
-    corr_loja.columns = ["loja", "correlacao"]
-    corr_loja = corr_loja.sort_values("correlacao")
-
-    fig_corr = px.bar(
-        corr_loja,
-        x="correlacao", y="loja",
-        orientation="h",
-        color="correlacao",
-        color_continuous_scale="RdYlGn",
-        labels={"correlacao": "Correlação (Desconto × Preço Antigo)", "loja": "Loja"},
-        title="Correlação entre Desconto e Preço Antigo por Loja"
-    )
-    fig_corr.update_layout(plot_bgcolor="white", yaxis={"categoryorder": "total ascending"})
-    st.plotly_chart(fig_corr, use_container_width=True)
-
-    corr_global = df_p2[["desconto_pct", "preco_antigo"]].corr().iloc[0, 1]
-    sinal = "positiva" if corr_global > 0 else "negativa"
-    intensidade = "fraca" if abs(corr_global) < 0.3 else ("moderada" if abs(corr_global) < 0.6 else "forte")
-    st.markdown(
-        f'<div class="conclusao-box">✅ <b>Conclusão parcial:</b> A correlação global entre desconto e preço antigo é '
-        f'<b>{corr_global:.3f}</b> — relação <b>{sinal} e {intensidade}</b>. '
-        f'Isso indica se os maiores descontos estão sendo oferecidos em produtos originalmente mais caros.</div>',
-        unsafe_allow_html=True
-    )
 
 
-# ══════════════════════════════════════════════
+
 # ABA 3 — PERGUNTA 3 — ML
-# ══════════════════════════════════════════════
 with abas[3]:
     st.markdown(
-        '<div class="pergunta-box">❓ <b>Pergunta 3:</b> É possível prever se um celular terá preço '
+        '<div class="pergunta-box"> <b>Pergunta 3:</b> É possível prever se um celular terá preço '
         'acima da mediana com base em desconto, avaliação e loja?</div>',
         unsafe_allow_html=True
     )
     st.caption("Respondida pela técnica de ML — Classificação com Random Forest. Avaliação foi incluída na modelagem junto com desconto e loja.")
 
-    with st.expander("ℹ️ Sobre o modelo — Random Forest (clique para expandir)", expanded=False):
+    with st.expander(" Sobre o modelo — Random Forest", expanded=False):
         st.markdown("""
         **Algoritmo:** Random Forest Classifier (scikit-learn)
 
@@ -592,9 +554,8 @@ with abas[3]:
     )
 
 
-# ══════════════════════════════════════════════
+
 # ABA 4 — MELHORES OPORTUNIDADES
-# ══════════════════════════════════════════════
 with abas[4]:
     st.subheader("Melhores Oportunidades")
     st.caption("Ranking dos anúncios com melhor relação entre desconto, avaliação e preço (score calculado).")
